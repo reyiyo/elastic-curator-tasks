@@ -1,0 +1,46 @@
+actions:
+  1:
+    action: forcemerge
+    description: >-
+      forceMerge ${INDEX_PREFIX} prefixed indices older than ${INDEX_ROTATION_TIME} ${TIME_UNIT} (based on index
+      creation_date) to 1 segments per shard.  Delay 120 seconds between each
+      forceMerge operation to allow the cluster to quiesce. Skip indices that
+      have already been forcemerged to the minimum number of segments to avoid
+      reprocessing.
+    options:
+      max_num_segments: 1
+      delay: 120
+      timeout_override:
+      continue_if_exception: True
+      ignore_empty_list: True
+    filters:
+    - filtertype: pattern
+      kind: prefix
+      value: ${INDEX_PREFIX}
+      exclude:
+    - filtertype: age
+      source: creation_date
+      direction: older
+      unit: ${TIME_UNIT}
+      unit_count: ${INDEX_ROTATION_TIME}
+      exclude:
+    - filtertype: forcemerged
+      max_num_segments: 1
+      exclude:
+  2:
+    action: delete_indices
+    description: >-
+      Delete indices older than $INDEX_MAX_AGE $TIME_UNIT (based on index name), for $INDEX_PREFIX
+      prefixed indices. Ignore the error if the filter does not result in an
+      actionable list of indices (ignore_empty_list) and exit cleanly.
+    options:
+      ignore_empty_list: True
+    filters:
+    - filtertype: pattern
+      kind: prefix
+      value: ${INDEX_PREFIX}
+    - filtertype: age
+      source: creation_date
+      direction: older
+      unit: ${TIME_UNIT}
+      unit_count: ${INDEX_MAX_AGE}

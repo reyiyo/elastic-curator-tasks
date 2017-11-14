@@ -1,0 +1,12 @@
+client:
+  hosts:
+    - ${ES_HOST}
+  port: ${ES_PORT}
+  http_auth: ${ES_AUTH}
+  timeout: 60
+
+logging:
+  loglevel: INFO
+  logfile:
+  logformat: default
+  blacklist: ['elasticsearch', 'urllib3']
